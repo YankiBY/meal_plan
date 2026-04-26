@@ -53,8 +53,8 @@ export default function ProgressPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-green-700">Прогресс</h1>
-        <button onClick={() => setShowForm(!showForm)} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        <h1 className="text-2xl font-bold text-rose">Прогресс</h1>
+        <button onClick={() => setShowForm(!showForm)} className="bg-olive text-white px-4 py-2 rounded hover:bg-olive-dark">
           {showForm ? 'Отмена' : 'Добавить запись'}
         </button>
       </div>
@@ -70,13 +70,13 @@ export default function ProgressPage() {
             <div><label className="text-sm text-gray-600">Углеводы (г)</label><input type="number" className="w-full px-3 py-2 border rounded" value={form.carbsConsumed} onChange={e => setForm({...form, carbsConsumed: e.target.value})} /></div>
             <div className="flex items-end"><label className="flex items-center gap-2"><input type="checkbox" checked={form.planComplied} onChange={e => setForm({...form, planComplied: e.target.checked})} /> <span className="text-sm">План выполнен</span></label></div>
           </div>
-          <button onClick={addProgress} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Сохранить</button>
+          <button onClick={addProgress} className="bg-olive text-white px-6 py-2 rounded hover:bg-olive-dark">Сохранить</button>
         </div>
       )}
 
       {chartData.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold text-green-700 mb-4">График веса</h2>
+          <h2 className="text-lg font-semibold text-rose mb-4">График веса</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -84,7 +84,7 @@ export default function ProgressPage() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="weight" stroke="#16a34a" name="Вес (кг)" />
+              <Line type="monotone" dataKey="weight" stroke="#b3cc57" name="Вес (кг)" />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -92,7 +92,7 @@ export default function ProgressPage() {
 
       {chartData.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold text-green-700 mb-4">Потребление БЖУ</h2>
+          <h2 className="text-lg font-semibold text-rose mb-4">Потребление БЖУ</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -100,9 +100,9 @@ export default function ProgressPage() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="calories" stroke="#ef4444" name="Калории" />
+              <Line type="monotone" dataKey="calories" stroke="#ef746f" name="Калории" />
               <Line type="monotone" dataKey="proteins" stroke="#3b82f6" name="Белки" />
-              <Line type="monotone" dataKey="fats" stroke="#f59e0b" name="Жиры" />
+              <Line type="monotone" dataKey="fats" stroke="#ffbe40" name="Жиры" />
               <Line type="monotone" dataKey="carbs" stroke="#8b5cf6" name="Углеводы" />
             </LineChart>
           </ResponsiveContainer>
@@ -110,7 +110,7 @@ export default function ProgressPage() {
       )}
 
       <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-lg font-semibold text-green-700 mb-4">История записей</h2>
+        <h2 className="text-lg font-semibold text-rose mb-4">История записей</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="bg-gray-50"><th className="p-2 text-left">Дата</th><th className="p-2">Вес</th><th className="p-2">Ккал</th><th className="p-2">Б</th><th className="p-2">Ж</th><th className="p-2">У</th><th className="p-2">План</th><th className="p-2"></th></tr></thead>
@@ -124,7 +124,7 @@ export default function ProgressPage() {
                   <td className="p-2 text-center">{p.fatsConsumed ?? '—'}</td>
                   <td className="p-2 text-center">{p.carbsConsumed ?? '—'}</td>
                   <td className="p-2 text-center">{p.planComplied ? 'Да' : 'Нет'}</td>
-                  <td className="p-2"><button onClick={() => deleteProgress(p.id!)} className="text-red-500 text-xs">Удалить</button></td>
+                  <td className="p-2"><button onClick={() => deleteProgress(p.id!)} className="text-coral text-xs">Удалить</button></td>
                 </tr>
               ))}
             </tbody>

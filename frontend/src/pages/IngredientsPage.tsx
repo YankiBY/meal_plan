@@ -32,34 +32,34 @@ export default function IngredientsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-green-700">Поиск продуктов</h1>
+      <h1 className="text-2xl font-bold text-rose">Поиск продуктов</h1>
 
       <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
           <h2 className="font-semibold">По штрих-коду</h2>
           <div className="flex gap-2">
             <input type="text" value={barcode} onChange={e => setBarcode(e.target.value)} className="flex-1 px-3 py-2 border rounded" placeholder="Введите штрих-код" />
-            <button onClick={searchByBarcode} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" disabled={!barcode}>Найти</button>
+            <button onClick={searchByBarcode} className="bg-olive text-white px-4 py-2 rounded hover:bg-olive-dark" disabled={!barcode}>Найти</button>
           </div>
         </div>
         <div className="space-y-3">
           <h2 className="font-semibold">По названию</h2>
           <div className="flex gap-2">
             <input type="text" value={searchName} onChange={e => setSearchName(e.target.value)} className="flex-1 px-3 py-2 border rounded" placeholder="Название продукта" />
-            <button onClick={searchByName} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" disabled={!searchName}>Найти</button>
+            <button onClick={searchByName} className="bg-olive text-white px-4 py-2 rounded hover:bg-olive-dark" disabled={!searchName}>Найти</button>
           </div>
         </div>
       </div>
 
       {result && (
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold text-green-700">{result.name}</h2>
+          <h2 className="text-lg font-semibold text-rose">{result.name}</h2>
           {result.barcode && <p className="text-sm text-gray-500">Штрих-код: {result.barcode}</p>}
           <div className="grid grid-cols-4 gap-4 mt-4">
-            <div className="bg-green-50 p-3 rounded text-center"><p className="text-xs text-gray-500">Калории</p><p className="text-lg font-bold text-green-700">{result.calories}</p></div>
-            <div className="bg-blue-50 p-3 rounded text-center"><p className="text-xs text-gray-500">Белки</p><p className="text-lg font-bold text-blue-700">{result.proteins}</p></div>
-            <div className="bg-yellow-50 p-3 rounded text-center"><p className="text-xs text-gray-500">Жиры</p><p className="text-lg font-bold text-yellow-700">{result.fats}</p></div>
-            <div className="bg-purple-50 p-3 rounded text-center"><p className="text-xs text-gray-500">Углеводы</p><p className="text-lg font-bold text-purple-700">{result.carbohydrates}</p></div>
+            <div className="bg-lime/30 p-3 rounded text-center"><p className="text-xs text-gray-500">Калории</p><p className="text-lg font-bold text-olive-dark">{result.calories}</p></div>
+            <div className="bg-amber/20 p-3 rounded text-center"><p className="text-xs text-gray-500">Белки</p><p className="text-lg font-bold text-amber-dark">{result.proteins}</p></div>
+            <div className="bg-coral-light p-3 rounded text-center"><p className="text-xs text-gray-500">Жиры</p><p className="text-lg font-bold text-coral-dark">{result.fats}</p></div>
+            <div className="bg-rose-light p-3 rounded text-center"><p className="text-xs text-gray-500">Углеводы</p><p className="text-lg font-bold text-rose">{result.carbohydrates}</p></div>
           </div>
         </div>
       )}

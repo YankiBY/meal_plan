@@ -77,19 +77,19 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-green-700">Профиль</h1>
+      <h1 className="text-2xl font-bold text-rose">Профиль</h1>
 
       {profile && (
         <div className="bg-white p-6 rounded-lg shadow flex items-center gap-6">
           <div className="relative">
             {profile.avatarPath ? (
-              <img src={profile.avatarPath} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-green-500" />
+              <img src={profile.avatarPath} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-olive" />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-green-200 flex items-center justify-center text-3xl text-green-700 font-bold border-4 border-green-500">
+              <div className="w-24 h-24 rounded-full bg-lime flex items-center justify-center text-3xl text-rose font-bold border-4 border-olive">
                 {profile.username[0].toUpperCase()}
               </div>
             )}
-            <label className="absolute bottom-0 right-0 bg-green-600 text-white rounded-full p-1 cursor-pointer hover:bg-green-700">
+            <label className="absolute bottom-0 right-0 bg-olive text-white rounded-full p-1 cursor-pointer hover:bg-olive-dark">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </label>
@@ -104,8 +104,8 @@ export default function ProfilePage() {
 
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-green-700">Профиль здоровья</h2>
-          <button onClick={() => setEditHealth(!editHealth)} className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200">
+          <h2 className="text-xl font-semibold text-rose">Профиль здоровья</h2>
+          <button onClick={() => setEditHealth(!editHealth)} className="text-sm bg-lime/30 text-rose px-3 py-1 rounded hover:bg-lime">
             {editHealth ? 'Отмена' : 'Редактировать'}
           </button>
         </div>
@@ -165,7 +165,7 @@ export default function ProfilePage() {
               <div className="flex flex-wrap gap-2">
                 {diseases.map(d => (
                   <button key={d.id} onClick={() => setForm({...form, diseaseIds: toggleId(form.diseaseIds, d.id)})}
-                    className={`px-3 py-1 rounded text-sm ${form.diseaseIds.includes(d.id) ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700'}`}>
+                    className={`px-3 py-1 rounded text-sm ${form.diseaseIds.includes(d.id) ? 'bg-coral text-white' : 'bg-gray-100 text-gray-700'}`}>
                     {d.name}
                   </button>
                 ))}
@@ -182,7 +182,7 @@ export default function ProfilePage() {
                 ))}
               </div>
             </div>
-            <button onClick={handleSaveHealth} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Сохранить</button>
+            <button onClick={handleSaveHealth} className="bg-olive text-white px-6 py-2 rounded hover:bg-olive-dark">Сохранить</button>
           </div>
         )}
       </div>
@@ -192,9 +192,9 @@ export default function ProfilePage() {
 
 function InfoCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`p-3 rounded-lg ${accent ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}`}>
+    <div className={`p-3 rounded-lg ${accent ? 'bg-lime/20 border border-lime-dark' : 'bg-gray-50'}`}>
       <p className="text-xs text-gray-500">{label}</p>
-      <p className={`text-lg font-semibold ${accent ? 'text-green-700' : ''}`}>{value}</p>
+      <p className={`text-lg font-semibold ${accent ? 'text-rose' : ''}`}>{value}</p>
     </div>
   );
 }

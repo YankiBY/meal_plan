@@ -25,24 +25,28 @@ public class RecipeService {
     private final CategoryRepository categoryRepository;
     private final RecipeMapper recipeMapper;
 
+    @Transactional(readOnly = true)
     public List<RecipeDto> getAllModerated() {
         return recipeRepository.findByIsModeratedTrue().stream()
             .map(recipeMapper::toDto)
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeDto> getAll() {
         return recipeRepository.findAll().stream()
             .map(recipeMapper::toDto)
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public RecipeDto getById(Long id) {
         return recipeRepository.findById(id)
             .map(recipeMapper::toDto)
             .orElseThrow(() -> new ResourceNotFoundException("Рецепт не найден"));
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeDto> getByAuthor(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));

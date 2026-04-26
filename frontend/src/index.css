@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@theme {
+  --color-olive: #b3cc57;
+  --color-olive-dark: #96ad3e;
+  --color-lime: #ecf081;
+  --color-lime-dark: #dce26a;
+  --color-amber: #ffbe40;
+  --color-amber-dark: #e5a530;
+  --color-coral: #ef746f;
+  --color-coral-dark: #d9524d;
+  --color-coral-light: #fbe8e7;
+  --color-rose: #ab3e5b;
+  --color-rose-dark: #8e3049;
+  --color-rose-light: #f0d0d9;
+}

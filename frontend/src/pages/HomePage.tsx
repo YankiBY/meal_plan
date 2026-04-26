@@ -18,13 +18,13 @@ export default function HomePage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-green-700 mb-2">Добро пожаловать, {user?.username}!</h1>
+      <h1 className="text-3xl font-bold text-rose mb-2">Добро пожаловать, {user?.username}!</h1>
       <p className="text-gray-500 mb-8">Система планирования питания с учётом здоровья</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.map(card => (
-          <Link key={card.to} to={card.to} className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow border-l-4 border-green-500">
+          <Link key={card.to} to={card.to} className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow border-l-4 border-olive">
             <div className="text-3xl mb-2">{card.icon}</div>
-            <h2 className="text-lg font-semibold text-green-700">{card.title}</h2>
+            <h2 className="text-lg font-semibold text-rose">{card.title}</h2>
             <p className="text-sm text-gray-500 mt-1">{card.desc}</p>
           </Link>
         ))}

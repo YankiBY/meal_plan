@@ -69,10 +69,10 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-green-700">Панель администратора</h1>
+      <h1 className="text-2xl font-bold text-rose">Панель администратора</h1>
       <div className="flex flex-wrap gap-2">
         {tabs.map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)} className={`px-3 py-1 rounded text-sm ${tab === t.key ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>{t.label}</button>
+          <button key={t.key} onClick={() => setTab(t.key)} className={`px-3 py-1 rounded text-sm ${tab === t.key ? 'bg-olive text-white' : 'bg-gray-100'}`}>{t.label}</button>
         ))}
       </div>
 
@@ -100,7 +100,7 @@ export default function AdminPage() {
                   <td className="p-3 font-medium">{u.username}</td>
                   <td className="p-3">{u.email}</td>
                   <td className="p-3 text-center text-xs">{u.roles.join(', ')}</td>
-                  <td className="p-3 text-center">{u.blocked ? <span className="text-red-600 font-medium">Заблокирован</span> : <span className="text-green-600">Активен</span>}</td>
+                  <td className="p-3 text-center">{u.blocked ? <span className="text-coral font-medium">Заблокирован</span> : <span className="text-olive">Активен</span>}</td>
                   <td className="p-3 text-center">
                     <div className="flex gap-1 justify-center flex-wrap">
                       {u.blocked ? <Btn onClick={() => unblockUser(u.id)} label="Разблокировать" /> : <Btn onClick={() => blockUser(u.id)} label="Заблокировать" color="red" />}
@@ -125,8 +125,8 @@ export default function AdminPage() {
               <p className="text-sm text-gray-500">{r.description}</p>
               <p className="text-xs text-gray-400 mt-1">Автор: {r.authorName} | Ккал: {r.totalCalories?.toFixed(0)}</p>
               <div className="flex gap-2 mt-2">
-                <button onClick={() => moderateRecipe(r.id, true)} className="bg-green-600 text-white px-3 py-1 rounded text-sm">Одобрить</button>
-                <button onClick={() => moderateRecipe(r.id, false)} className="bg-red-600 text-white px-3 py-1 rounded text-sm">Отклонить</button>
+                <button onClick={() => moderateRecipe(r.id, true)} className="bg-olive text-white px-3 py-1 rounded text-sm">Одобрить</button>
+                <button onClick={() => moderateRecipe(r.id, false)} className="bg-coral text-white px-3 py-1 rounded text-sm">Отклонить</button>
               </div>
             </div>
           ))}
@@ -142,7 +142,7 @@ export default function AdminPage() {
 }
 
 function StatCard({ label, value, color }: { label: string; value: number; color?: string }) {
-  const colors: Record<string, string> = { red: 'text-red-700 bg-red-50', yellow: 'text-yellow-700 bg-yellow-50', green: 'text-green-700 bg-green-50' };
+  const colors: Record<string, string> = { red: 'text-coral-dark bg-coral-light', yellow: 'text-amber-dark bg-amber/20', green: 'text-olive-dark bg-lime/30' };
   return (
     <div className={`p-4 rounded-lg ${color ? colors[color] : 'bg-gray-50'}`}>
       <p className="text-xs text-gray-500">{label}</p>
@@ -152,7 +152,7 @@ function StatCard({ label, value, color }: { label: string; value: number; color
 }
 
 function Btn({ onClick, label, color }: { onClick: () => void; label: string; color?: string }) {
-  return <button onClick={onClick} className={`text-xs px-2 py-1 rounded ${color === 'red' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'} hover:opacity-80`}>{label}</button>;
+  return <button onClick={onClick} className={`text-xs px-2 py-1 rounded ${color === 'red' ? 'bg-coral-light text-coral-dark' : 'bg-gray-100 text-gray-700'} hover:opacity-80`}>{label}</button>;
 }
 
 function CrudPanel<T extends { id: number }>({ items, name, fields, apiPath, reload }: { items: T[]; name: string; fields: string[]; apiPath: string; reload: () => void }) {
@@ -178,7 +178,7 @@ function CrudPanel<T extends { id: number }>({ items, name, fields, apiPath, rel
 
   return (
     <div className="space-y-4">
-      <button onClick={() => setShowAdd(!showAdd)} className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700">
+      <button onClick={() => setShowAdd(!showAdd)} className="bg-olive text-white px-4 py-2 rounded text-sm hover:bg-olive-dark">
         {showAdd ? 'Отмена' : `Добавить ${name}`}
       </button>
       {showAdd && (
@@ -186,7 +186,7 @@ function CrudPanel<T extends { id: number }>({ items, name, fields, apiPath, rel
           {fields.map(f => (
             <div key={f}><label className="text-xs text-gray-500">{f}</label><input className="block px-2 py-1 border rounded text-sm w-36" value={form[f] || ''} onChange={e => setForm({...form, [f]: e.target.value})} /></div>
           ))}
-          <button onClick={handleCreate} className="bg-green-600 text-white px-3 py-1 rounded text-sm">Добавить</button>
+          <button onClick={handleCreate} className="bg-olive text-white px-3 py-1 rounded text-sm">Добавить</button>
         </div>
       )}
       <div className="bg-white rounded-lg shadow overflow-x-auto">
@@ -197,7 +197,7 @@ function CrudPanel<T extends { id: number }>({ items, name, fields, apiPath, rel
               <tr key={item.id} className="border-t">
                 <td className="p-2">{item.id}</td>
                 {fields.map(f => <td key={f} className="p-2">{String((item as Record<string, unknown>)[f] ?? '')}</td>)}
-                <td className="p-2 text-center"><button onClick={() => handleDelete(item.id)} className="text-red-500 text-xs">Удалить</button></td>
+                <td className="p-2 text-center"><button onClick={() => handleDelete(item.id)} className="text-coral text-xs">Удалить</button></td>
               </tr>
             ))}
           </tbody>

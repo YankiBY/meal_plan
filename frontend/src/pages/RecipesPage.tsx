@@ -62,11 +62,11 @@ export default function RecipesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <h1 className="text-2xl font-bold text-green-700">Рецепты</h1>
+        <h1 className="text-2xl font-bold text-rose">Рецепты</h1>
         <div className="flex gap-2">
           {(['all', 'my', 'create'] as const).map(t => (
             <button key={t} onClick={() => { setTab(t); setSelected(null); }}
-              className={`px-3 py-1 rounded text-sm ${tab === t ? 'bg-green-600 text-white' : 'bg-gray-100'}`}>
+              className={`px-3 py-1 rounded text-sm ${tab === t ? 'bg-olive text-white' : 'bg-gray-100'}`}>
               {t === 'all' ? 'Все' : t === 'my' ? 'Мои' : 'Создать'}
             </button>
           ))}
@@ -85,14 +85,14 @@ export default function RecipesPage() {
           </div>
 
           <div>
-            <div className="flex justify-between items-center"><label className="text-sm text-gray-600">Ингредиенты</label><button onClick={addIngredient} className="text-sm text-green-600">+ Добавить</button></div>
+            <div className="flex justify-between items-center"><label className="text-sm text-gray-600">Ингредиенты</label><button onClick={addIngredient} className="text-sm text-olive">+ Добавить</button></div>
             {form.ingredients.map((ing, i) => (
               <div key={i} className="flex gap-2 mt-1">
                 <select className="flex-1 px-2 py-1 border rounded text-sm" value={ing.ingredientId} onChange={e => { const n = [...form.ingredients]; n[i].ingredientId = parseInt(e.target.value); setForm({...form, ingredients: n}); }}>
                   {ingredients.map(ig => <option key={ig.id} value={ig.id}>{ig.name}</option>)}
                 </select>
                 <input type="number" className="w-24 px-2 py-1 border rounded text-sm" value={ing.amount} onChange={e => { const n = [...form.ingredients]; n[i].amount = parseFloat(e.target.value); setForm({...form, ingredients: n}); }} placeholder="г" />
-                <button onClick={() => setForm({...form, ingredients: form.ingredients.filter((_, j) => j !== i)})} className="text-red-500 text-sm">x</button>
+                <button onClick={() => setForm({...form, ingredients: form.ingredients.filter((_, j) => j !== i)})} className="text-coral text-sm">x</button>
               </div>
             ))}
           </div>
@@ -101,24 +101,24 @@ export default function RecipesPage() {
             <label className="text-sm text-gray-600">Категории</label>
             <div className="flex flex-wrap gap-2 mt-1">
               {categories.map(c => (
-                <button key={c.id} onClick={() => toggleCategory(c.id)} className={`px-3 py-1 rounded text-sm ${form.categoryIds.includes(c.id) ? 'bg-green-500 text-white' : 'bg-gray-100'}`}>{c.name}</button>
+                <button key={c.id} onClick={() => toggleCategory(c.id)} className={`px-3 py-1 rounded text-sm ${form.categoryIds.includes(c.id) ? 'bg-olive text-white' : 'bg-gray-100'}`}>{c.name}</button>
               ))}
             </div>
           </div>
 
-          <button onClick={createRecipe} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" disabled={!form.title}>Создать рецепт</button>
+          <button onClick={createRecipe} className="bg-olive text-white px-6 py-2 rounded hover:bg-olive-dark" disabled={!form.title}>Создать рецепт</button>
         </div>
       )}
 
       {tab !== 'create' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {(tab === 'all' ? recipes : myRecipes).map(recipe => (
-            <div key={recipe.id} className={`bg-white p-4 rounded-lg shadow cursor-pointer border-2 ${selected?.id === recipe.id ? 'border-green-500' : 'border-transparent'}`} onClick={() => setSelected(recipe)}>
-              <h3 className="font-semibold text-green-700">{recipe.title}</h3>
+            <div key={recipe.id} className={`bg-white p-4 rounded-lg shadow cursor-pointer border-2 ${selected?.id === recipe.id ? 'border-olive' : 'border-transparent'}`} onClick={() => setSelected(recipe)}>
+              <h3 className="font-semibold text-rose">{recipe.title}</h3>
               <p className="text-sm text-gray-500 line-clamp-2">{recipe.description}</p>
               <p className="text-xs text-gray-400 mt-1">Ккал: {recipe.totalCalories?.toFixed(0)} | Б: {recipe.totalProteins?.toFixed(0)} | Ж: {recipe.totalFats?.toFixed(0)} | У: {recipe.totalCarbohydrates?.toFixed(0)}</p>
               {!recipe.moderated && <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded mt-1 inline-block">На модерации</span>}
-              {tab === 'my' && <button onClick={e => { e.stopPropagation(); deleteRecipe(recipe.id); }} className="text-xs text-red-500 mt-1 block">Удалить</button>}
+              {tab === 'my' && <button onClick={e => { e.stopPropagation(); deleteRecipe(recipe.id); }} className="text-xs text-coral mt-1 block">Удалить</button>}
             </div>
           ))}
         </div>
@@ -126,7 +126,7 @@ export default function RecipesPage() {
 
       {selected && (
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold text-green-700">{selected.title}</h2>
+          <h2 className="text-xl font-semibold text-rose">{selected.title}</h2>
           <p className="text-gray-600 mt-2">{selected.description}</p>
           <p className="mt-3 text-sm whitespace-pre-wrap">{selected.instructions}</p>
           {selected.ingredients && selected.ingredients.length > 0 && (

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:15:///meal_plan_test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: never
+
+app:
+  jwt:
+    secret: VGhpc0lzQVZlcnlMb25nU2VjcmV0S2V5Rm9yTWVhbFBsYW5BcHBsaWNhdGlvbjIwMjQ=
+    expiration-ms: 86400000
+  upload:
+    dir: /tmp/test-uploads
