@@ -19,6 +19,9 @@ public class UserProgress {
     private LocalDate date;
     private Double weight;
     private Double caloriesConsumed;
+    private Double proteinsConsumed;
+    private Double fatsConsumed;
+    private Double carbsConsumed;
     private boolean planComplied;
 
     @ManyToOne(fetch = FetchType.LAZY)

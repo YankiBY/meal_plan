@@ -5,6 +5,7 @@ import java.util.Set;
 
 @Data
 public class HealthProfileDto {
+    private Long id;
     private Double weight;
     private Double height;
     private Integer age;
@@ -14,6 +15,8 @@ public class HealthProfileDto {
     private Double dailyProteinTarget;
     private Double dailyFatTarget;
     private Double dailyCarbTarget;
-    private Set<String> diseases;
-    private Set<String> allergens;
+    private Set<Long> diseaseIds;
+    private Set<Long> allergenIds;
+    private Set<String> diseaseNames;
+    private Set<String> allergenNames;
 }
