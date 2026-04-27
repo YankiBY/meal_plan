@@ -8,5 +8,7 @@ public class UserDto {
     private Long id;
     private String username;
     private String email;
+    private String avatarPath;
+    private boolean blocked;
     private Set<String> roles;
 }

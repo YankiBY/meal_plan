@@ -2,6 +2,7 @@ package com.example.mealplan.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,6 +26,13 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "avatar_path")
+    private String avatarPath;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean blocked = false;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
@@ -32,5 +40,5 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @Builder.Default
-    private java.util.Set<Role> roles = new java.util.HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 }

@@ -15,5 +15,9 @@ public class RecipeDto {
     private Double totalProteins;
     private Double totalFats;
     private Double totalCarbohydrates;
+    private boolean moderated;
     private String authorName;
+    private Long authorId;
+    private List<RecipeIngredientDto> ingredients;
+    private List<String> categories;
 }

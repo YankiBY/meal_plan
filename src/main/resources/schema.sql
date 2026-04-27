@@ -1,5 +1,4 @@
 -- Схема БД для приложения Meal Plan (3НФ)
--- Минимум 8 связанных таблиц
 
 -- 1. Роли пользователей
 CREATE TABLE IF NOT EXISTS roles (
@@ -12,7 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    avatar_path VARCHAR(500),
+    blocked BOOLEAN DEFAULT FALSE
 );
 
 -- 3. Связь пользователей и ролей (Many-to-Many)
@@ -135,15 +136,22 @@ CREATE TABLE IF NOT EXISTS meals (
     id SERIAL PRIMARY KEY,
     meal_plan_day_id INTEGER NOT NULL REFERENCES meal_plan_days(id) ON DELETE CASCADE,
     recipe_id INTEGER NOT NULL REFERENCES recipes(id),
-    meal_type VARCHAR(20) NOT NULL -- BREAKFAST, LUNCH, DINNER, SNACK
+    meal_type VARCHAR(20) NOT NULL
 );
 
--- 17. Прогресс пользователя (динамика веса и выполнение плана)
+-- 17. Прогресс пользователя
 CREATE TABLE IF NOT EXISTS user_progress (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     date DATE NOT NULL,
     weight DOUBLE PRECISION,
     calories_consumed DOUBLE PRECISION,
+    proteins_consumed DOUBLE PRECISION,
+    fats_consumed DOUBLE PRECISION,
+    carbs_consumed DOUBLE PRECISION,
     plan_complied BOOLEAN DEFAULT FALSE
 );
+
+-- Начальные данные
+INSERT INTO roles (name) VALUES ('ROLE_USER') ON CONFLICT (name) DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_ADMIN') ON CONFLICT (name) DO NOTHING;

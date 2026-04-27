@@ -1,14 +1,18 @@
 package com.example.mealplan.controller;
 
+import com.example.mealplan.dto.MealPlanDto;
+import com.example.mealplan.dto.MealPlanGenerateRequest;
 import com.example.mealplan.entity.MealPlan;
 import com.example.mealplan.service.ExportService;
 import com.example.mealplan.service.MealPlanService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDate;
+
 import java.util.List;
 import java.util.Map;
 
@@ -20,16 +24,33 @@ public class MealPlanController {
     private final ExportService exportService;
 
     @GetMapping
-    public ResponseEntity<List<MealPlan>> getMyPlans(Authentication authentication) {
+    public ResponseEntity<List<MealPlanDto>> getMyPlans(Authentication authentication) {
         return ResponseEntity.ok(mealPlanService.getPlansForUser(authentication.getName()));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<MealPlanDto> getPlanById(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(mealPlanService.getPlanById(id, authentication.getName()));
+    }
+
     @PostMapping("/generate")
-    public ResponseEntity<MealPlan> generatePlan(
-            Authentication authentication,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        return ResponseEntity.ok(mealPlanService.generatePlan(authentication.getName(), start, end));
+    public ResponseEntity<MealPlanDto> generatePlan(Authentication authentication,
+                                                     @Valid @RequestBody MealPlanGenerateRequest request) {
+        return ResponseEntity.ok(mealPlanService.generatePlan(authentication.getName(), request));
+    }
+
+    @PutMapping("/{planId}/meals/{mealId}/replace")
+    public ResponseEntity<MealPlanDto> replaceMeal(Authentication authentication,
+                                                    @PathVariable Long planId,
+                                                    @PathVariable Long mealId,
+                                                    @RequestParam Long recipeId) {
+        return ResponseEntity.ok(mealPlanService.replaceMeal(authentication.getName(), planId, mealId, recipeId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlan(@PathVariable Long id, Authentication authentication) {
+        mealPlanService.deletePlan(authentication.getName(), id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/shopping-list")
@@ -41,6 +62,20 @@ public class MealPlanController {
     @GetMapping("/{id}/export/pdf")
     public ResponseEntity<byte[]> exportPdf(@PathVariable Long id) {
         MealPlan plan = mealPlanService.getById(id);
-        return ResponseEntity.ok(exportService.exportToPdf(plan));
+        byte[] pdfBytes = exportService.exportToPdf(plan);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=meal_plan_" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
+    }
+
+    @GetMapping("/{id}/export/excel")
+    public ResponseEntity<byte[]> exportExcel(@PathVariable Long id) {
+        MealPlan plan = mealPlanService.getById(id);
+        byte[] excelBytes = exportService.exportToExcel(plan);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=meal_plan_" + id + ".xlsx")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(excelBytes);
     }
 }
