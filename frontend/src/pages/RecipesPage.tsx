@@ -11,6 +11,7 @@ export default function RecipesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [form, setForm] = useState({ title: '', description: '', instructions: '', prepTime: '', cookTime: '', ingredients: [] as { ingredientId: number; amount: number }[], categoryIds: [] as number[] });
   const [selected, setSelected] = useState<RecipeDto | null>(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => { loadData(); }, []);
 
@@ -59,6 +60,10 @@ export default function RecipesPage() {
     setForm({ ...form, categoryIds: form.categoryIds.includes(id) ? form.categoryIds.filter(c => c !== id) : [...form.categoryIds, id] });
   };
 
+  const currentList = (tab === 'all' ? recipes : myRecipes).filter(r =>
+    (r.title + ' ' + (r.description || '')).toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -72,6 +77,17 @@ export default function RecipesPage() {
           ))}
         </div>
       </div>
+
+      {tab !== 'create' && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="bg-white p-4 rounded-lg shadow"><p className="text-xs text-gray-500">Найдено рецептов</p><p className="text-xl font-semibold">{currentList.length}</p></div>
+          <div className="bg-white p-4 rounded-lg shadow"><p className="text-xs text-gray-500">На модерации</p><p className="text-xl font-semibold">{myRecipes.filter(r => !r.moderated).length}</p></div>
+          <div className="md:col-span-2 bg-white p-4 rounded-lg shadow">
+            <label className="text-xs text-gray-500 block mb-1">Поиск по названию/описанию</label>
+            <input value={search} onChange={e => setSearch(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="Введите текст..." />
+          </div>
+        </div>
+      )}
 
       {tab === 'create' && (
         <div className="bg-white p-6 rounded-lg shadow space-y-4">
@@ -112,7 +128,7 @@ export default function RecipesPage() {
 
       {tab !== 'create' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(tab === 'all' ? recipes : myRecipes).map(recipe => (
+          {currentList.map(recipe => (
             <div key={recipe.id} className={`bg-white p-4 rounded-lg shadow cursor-pointer border-2 ${selected?.id === recipe.id ? 'border-olive' : 'border-transparent'}`} onClick={() => setSelected(recipe)}>
               <h3 className="font-semibold text-rose">{recipe.title}</h3>
               <p className="text-sm text-gray-500 line-clamp-2">{recipe.description}</p>

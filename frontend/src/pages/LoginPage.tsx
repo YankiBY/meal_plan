@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -21,26 +24,49 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6 text-rose">Вход в MealPlan</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Логин</label>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-olive focus:border-olive" required />
+    <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(70%_50%_at_50%_0%,rgba(171,62,91,0.18)_0%,rgba(255,255,255,0)_55%),radial-gradient(70%_50%_at_50%_100%,rgba(179,204,87,0.22)_0%,rgba(255,255,255,0)_55%)]">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-rose text-white shadow-sm">
+            🍽
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Пароль</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-olive focus:border-olive" required />
-          </div>
-          <button type="submit" className="w-full bg-olive text-white py-2 rounded-md hover:bg-olive-dark">Войти</button>
-        </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Нет аккаунта? <Link to="/register" className="text-rose hover:underline">Зарегистрироваться</Link>
-        </p>
-      </div>
+          <CardTitle className="text-rose">Вход в MealPlan</CardTitle>
+          <CardDescription>Планирование питания с учётом здоровья</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">Логин</label>
+              <Input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Введите логин"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">Пароль</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Введите пароль"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Войти
+            </Button>
+          </form>
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Нет аккаунта?{' '}
+            <Link to="/register" className="font-medium text-rose hover:underline">
+              Зарегистрироваться
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

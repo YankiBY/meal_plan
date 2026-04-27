@@ -1,6 +1,7 @@
 package com.example.mealplan.controller;
 
 import com.example.mealplan.dto.HealthProfileDto;
+import com.example.mealplan.dto.NutritionExplanationDto;
 import com.example.mealplan.dto.UserDto;
 import com.example.mealplan.service.HealthProfileService;
 import com.example.mealplan.service.UserService;
@@ -42,5 +43,10 @@ public class ProfileController {
     public ResponseEntity<HealthProfileDto> updateHealthProfile(Authentication authentication,
                                                                  @RequestBody HealthProfileDto dto) {
         return ResponseEntity.ok(healthProfileService.updateProfile(authentication.getName(), dto));
+    }
+
+    @GetMapping("/health/explanation")
+    public ResponseEntity<NutritionExplanationDto> getNutritionExplanation(Authentication authentication) {
+        return ResponseEntity.ok(healthProfileService.getNutritionExplanation(authentication.getName()));
     }
 }

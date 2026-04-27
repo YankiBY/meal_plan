@@ -11,6 +11,8 @@ export default function MealPlansPage() {
   const [planName, setPlanName] = useState('');
   const [selectedPlan, setSelectedPlan] = useState<MealPlanDto | null>(null);
   const [recipes, setRecipes] = useState<RecipeDto[]>([]);
+  const [search, setSearch] = useState('');
+  const [shoppingList, setShoppingList] = useState<Record<string, number> | null>(null);
 
   useEffect(() => { loadPlans(); loadRecipes(); }, []);
 
@@ -63,7 +65,19 @@ export default function MealPlansPage() {
     window.open(`/api/meal-plans/${id}/export/excel`, '_blank');
   };
 
+  const loadShoppingList = async (id: number) => {
+    try {
+      const res = await api.get<Record<string, number>>(`/meal-plans/${id}/shopping-list`);
+      setShoppingList(res.data);
+      toast.success('Список продуктов загружен');
+    } catch {
+      toast.error('Не удалось загрузить список продуктов');
+    }
+  };
+
   const mealTypeLabel: Record<string, string> = { BREAKFAST: 'Завтрак', LUNCH: 'Обед', DINNER: 'Ужин', SNACK: 'Перекус' };
+  const filteredPlans = plans.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+  const avgCalories = plans.length ? plans.reduce((s, p) => s + (p.totalCalories || 0), 0) / plans.length : 0;
 
   return (
     <div className="space-y-6">
@@ -72,6 +86,15 @@ export default function MealPlansPage() {
         <button onClick={() => setShowGenerate(!showGenerate)} className="bg-olive text-white px-4 py-2 rounded hover:bg-olive-dark">
           {showGenerate ? 'Отмена' : 'Создать план'}
         </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="bg-white p-4 rounded-lg shadow"><p className="text-xs text-gray-500">Всего планов</p><p className="text-xl font-semibold">{plans.length}</p></div>
+        <div className="bg-white p-4 rounded-lg shadow"><p className="text-xs text-gray-500">Средняя калорийность</p><p className="text-xl font-semibold">{avgCalories.toFixed(0)}</p></div>
+        <div className="md:col-span-2 bg-white p-4 rounded-lg shadow">
+          <label className="text-xs text-gray-500 block mb-1">Поиск по названию</label>
+          <input value={search} onChange={e => setSearch(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="Например: план на неделю" />
+        </div>
       </div>
 
       {showGenerate && (
@@ -96,7 +119,7 @@ export default function MealPlansPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {plans.map(plan => (
+        {filteredPlans.map(plan => (
           <div key={plan.id} className={`bg-white p-4 rounded-lg shadow cursor-pointer border-2 ${selectedPlan?.id === plan.id ? 'border-olive' : 'border-transparent'}`} onClick={() => setSelectedPlan(plan)}>
             <h3 className="font-semibold text-rose">{plan.name}</h3>
             <p className="text-sm text-gray-500">{plan.startDate} — {plan.endDate}</p>
@@ -104,6 +127,7 @@ export default function MealPlansPage() {
             <div className="flex gap-2 mt-3">
               <button onClick={e => { e.stopPropagation(); exportPdf(plan.id); }} className="text-xs bg-coral-light text-coral-dark px-2 py-1 rounded">PDF</button>
               <button onClick={e => { e.stopPropagation(); exportExcel(plan.id); }} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Excel</button>
+              <button onClick={e => { e.stopPropagation(); loadShoppingList(plan.id); }} className="text-xs bg-lime/40 text-olive-dark px-2 py-1 rounded">Продукты</button>
               <button onClick={e => { e.stopPropagation(); deletePlan(plan.id); }} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-coral-light">Удалить</button>
             </div>
           </div>
@@ -131,6 +155,20 @@ export default function MealPlansPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {shoppingList && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg font-semibold text-rose mb-3">Список продуктов</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
+            {Object.entries(shoppingList).map(([name, amount]) => (
+              <div key={name} className="bg-gray-50 rounded p-2 flex justify-between">
+                <span>{name}</span>
+                <span className="font-medium">{amount.toFixed(0)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import api from '../api/client';
 import toast from 'react-hot-toast';
-import type { Ingredient } from '../types';
+import type { IngredientSafetyDto } from '../types';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import Badge from '../components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 
 export default function IngredientsPage() {
   const [barcode, setBarcode] = useState('');
   const [searchName, setSearchName] = useState('');
-  const [result, setResult] = useState<Ingredient | null>(null);
+  const [result, setResult] = useState<IngredientSafetyDto | null>(null);
 
   const searchByBarcode = async () => {
     try {
-      const res = await api.get<Ingredient>(`/ingredients/barcode/${barcode}`);
+      const res = await api.get<IngredientSafetyDto>(`/ingredients/barcode/${barcode}/check`);
       setResult(res.data);
       toast.success('Продукт найден');
     } catch {
@@ -21,7 +25,7 @@ export default function IngredientsPage() {
 
   const searchByName = async () => {
     try {
-      const res = await api.get<Ingredient>(`/ingredients/search?name=${searchName}`);
+      const res = await api.get<IngredientSafetyDto>(`/ingredients/search/check?name=${encodeURIComponent(searchName)}`);
       setResult(res.data);
       toast.success('Продукт найден');
     } catch {
@@ -32,37 +36,82 @@ export default function IngredientsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-rose">Поиск продуктов</h1>
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Поиск продуктов</h1>
+        <p className="text-sm text-gray-500">По штрих-коду или названию, с проверкой по вашему профилю</p>
+      </div>
 
-      <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-3">
-          <h2 className="font-semibold">По штрих-коду</h2>
-          <div className="flex gap-2">
-            <input type="text" value={barcode} onChange={e => setBarcode(e.target.value)} className="flex-1 px-3 py-2 border rounded" placeholder="Введите штрих-код" />
-            <button onClick={searchByBarcode} className="bg-olive text-white px-4 py-2 rounded hover:bg-olive-dark" disabled={!barcode}>Найти</button>
-          </div>
-        </div>
-        <div className="space-y-3">
-          <h2 className="font-semibold">По названию</h2>
-          <div className="flex gap-2">
-            <input type="text" value={searchName} onChange={e => setSearchName(e.target.value)} className="flex-1 px-3 py-2 border rounded" placeholder="Название продукта" />
-            <button onClick={searchByName} className="bg-olive text-white px-4 py-2 rounded hover:bg-olive-dark" disabled={!searchName}>Найти</button>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-rose">По штрих-коду</CardTitle>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Input value={barcode} onChange={(e) => setBarcode(e.target.value)} placeholder="Введите штрих-код" />
+            <Button onClick={searchByBarcode} disabled={!barcode}>
+              Найти
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-rose">По названию</CardTitle>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Input value={searchName} onChange={(e) => setSearchName(e.target.value)} placeholder="Название продукта" />
+            <Button onClick={searchByName} disabled={!searchName}>
+              Найти
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       {result && (
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold text-rose">{result.name}</h2>
-          {result.barcode && <p className="text-sm text-gray-500">Штрих-код: {result.barcode}</p>}
-          <div className="grid grid-cols-4 gap-4 mt-4">
-            <div className="bg-lime/30 p-3 rounded text-center"><p className="text-xs text-gray-500">Калории</p><p className="text-lg font-bold text-olive-dark">{result.calories}</p></div>
-            <div className="bg-amber/20 p-3 rounded text-center"><p className="text-xs text-gray-500">Белки</p><p className="text-lg font-bold text-amber-dark">{result.proteins}</p></div>
-            <div className="bg-coral-light p-3 rounded text-center"><p className="text-xs text-gray-500">Жиры</p><p className="text-lg font-bold text-coral-dark">{result.fats}</p></div>
-            <div className="bg-rose-light p-3 rounded text-center"><p className="text-xs text-gray-500">Углеводы</p><p className="text-lg font-bold text-rose">{result.carbohydrates}</p></div>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="flex-row items-start justify-between gap-3">
+            <div>
+              <CardTitle className="text-rose">{result.ingredient.name}</CardTitle>
+              {result.ingredient.barcode && (
+                <div className="text-sm text-gray-500">Штрих-код: {result.ingredient.barcode}</div>
+              )}
+            </div>
+            {result.allowed ? (
+              <Badge variant="success">разрешено</Badge>
+            ) : (
+              <Badge variant="danger">запрещено</Badge>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-sm text-gray-600">{result.note}</div>
+            {result.matchedAllergens?.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {result.matchedAllergens.map((a) => (
+                  <Badge key={a} variant="danger">
+                    {a}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Macro label="Калории" value={result.ingredient.calories} />
+              <Macro label="Белки" value={result.ingredient.proteins} />
+              <Macro label="Жиры" value={result.ingredient.fats} />
+              <Macro label="Углеводы" value={result.ingredient.carbohydrates} />
+            </div>
+          </CardContent>
+        </Card>
       )}
+    </div>
+  );
+}
+
+function Macro({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl bg-gray-50 ring-1 ring-gray-100 p-3 text-center">
+      <div className="text-xs text-gray-500">{label}</div>
+      <div className="text-lg font-semibold text-gray-900">{Number.isFinite(value) ? value : 0}</div>
     </div>
   );
 }

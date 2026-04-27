@@ -54,8 +54,11 @@ public class MealPlanController {
     }
 
     @GetMapping("/{id}/shopping-list")
-    public ResponseEntity<Map<String, Double>> getShoppingList(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Double>> getShoppingList(@PathVariable Long id, Authentication authentication) {
         MealPlan plan = mealPlanService.getById(id);
+        if (!plan.getUser().getUsername().equals(authentication.getName())) {
+            return ResponseEntity.status(403).build();
+        }
         return ResponseEntity.ok(exportService.getShoppingList(plan));
     }
 

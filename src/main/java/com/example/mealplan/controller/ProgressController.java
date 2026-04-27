@@ -1,6 +1,7 @@
 package com.example.mealplan.controller;
 
 import com.example.mealplan.dto.ProgressDto;
+import com.example.mealplan.dto.ProgressCalendarDayDto;
 import com.example.mealplan.service.ProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,5 +49,13 @@ public class ProgressController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         return ResponseEntity.ok(progressService.getProgressForPeriod(authentication.getName(), start, end));
+    }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<List<ProgressCalendarDayDto>> getCalendar(
+            Authentication authentication,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        return ResponseEntity.ok(progressService.getCalendar(authentication.getName(), start, end));
     }
 }

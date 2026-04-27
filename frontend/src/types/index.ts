@@ -106,6 +106,23 @@ export interface ProgressDto {
   planComplied: boolean;
 }
 
+export interface ProgressCalendarDayDto {
+  date: string;
+  hasEntry: boolean;
+  planComplied: boolean;
+  weight: number | null;
+}
+
+export interface NutritionExplanationDto {
+  bmr: number;
+  activityMultiplier: number;
+  diseaseMultipliers: Array<{ diseaseId: number; diseaseName: string; multiplier: number | null }>;
+  dailyCalories: number;
+  dailyProteins: number;
+  dailyFats: number;
+  dailyCarbs: number;
+}
+
 export interface ActivityStatsDto {
   totalUsers: number;
   totalRecipes: number;
@@ -144,4 +161,11 @@ export interface Ingredient {
   fats: number;
   carbohydrates: number;
   barcode: string;
+}
+
+export interface IngredientSafetyDto {
+  ingredient: Ingredient;
+  allowed: boolean;
+  matchedAllergens: string[];
+  note: string;
 }

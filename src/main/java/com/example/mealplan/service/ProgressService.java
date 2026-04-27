@@ -1,6 +1,7 @@
 package com.example.mealplan.service;
 
 import com.example.mealplan.dto.ProgressDto;
+import com.example.mealplan.dto.ProgressCalendarDayDto;
 import com.example.mealplan.entity.User;
 import com.example.mealplan.entity.UserProgress;
 import com.example.mealplan.exception.ResourceNotFoundException;
@@ -11,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +95,30 @@ public class ProgressService {
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
         return progressRepository.findByUserIdAndDateBetween(user.getId(), start, end).stream()
                 .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProgressCalendarDayDto> getCalendar(String username, LocalDate start, LocalDate end) {
+        if (end.isBefore(start)) {
+            throw new RuntimeException("Некорректный период");
+        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
+
+        Map<LocalDate, UserProgress> byDate = progressRepository.findByUserIdAndDateBetween(user.getId(), start, end)
+                .stream()
+                .collect(Collectors.toMap(UserProgress::getDate, Function.identity(), (a, b) -> a));
+
+        long days = ChronoUnit.DAYS.between(start, end) + 1;
+        return java.util.stream.LongStream.range(0, days)
+                .mapToObj(i -> start.plusDays(i))
+                .map(date -> {
+                    UserProgress p = byDate.get(date);
+                    if (p == null) {
+                        return new ProgressCalendarDayDto(date, false, false, null);
+                    }
+                    return new ProgressCalendarDayDto(date, true, p.isPlanComplied(), p.getWeight());
+                })
                 .collect(Collectors.toList());
     }
 
