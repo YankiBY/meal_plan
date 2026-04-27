@@ -7,9 +7,38 @@ import Input from '../components/ui/Input';
 import Badge from '../components/ui/Badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 
+const EMPTY_HEALTH: HealthProfileDto = {
+  id: 0,
+  weight: null,
+  height: null,
+  age: null,
+  gender: null,
+  activityLevel: null,
+  dailyCalorieTarget: null,
+  dailyProteinTarget: null,
+  dailyFatTarget: null,
+  dailyCarbTarget: null,
+  diseaseIds: [],
+  allergenIds: [],
+  diseaseNames: [],
+  allergenNames: [],
+};
+
+type FormState = { weight: string; height: string; age: string; gender: string; activityLevel: string; diseaseIds: number[]; allergenIds: number[] };
+
+const healthToForm = (h: HealthProfileDto): FormState => ({
+  weight: h.weight?.toString() ?? '',
+  height: h.height?.toString() ?? '',
+  age: h.age?.toString() ?? '',
+  gender: h.gender ?? 'MALE',
+  activityLevel: h.activityLevel ?? 'MODERATE',
+  diseaseIds: Array.from(h.diseaseIds ?? []),
+  allergenIds: Array.from(h.allergenIds ?? []),
+});
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserDto | null>(null);
-  const [health, setHealth] = useState<HealthProfileDto | null>(null);
+  const [health, setHealth] = useState<HealthProfileDto>(EMPTY_HEALTH);
   const [explanation, setExplanation] = useState<NutritionExplanationDto | null>(null);
   const [diseases, setDiseases] = useState<Disease[]>([]);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
@@ -17,7 +46,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [newDisease, setNewDisease] = useState('');
   const [newAllergen, setNewAllergen] = useState('');
-  const [form, setForm] = useState({ weight: '', height: '', age: '', gender: 'MALE', activityLevel: 'MODERATE', diseaseIds: [] as number[], allergenIds: [] as number[] });
+  const [form, setForm] = useState<FormState>(healthToForm(EMPTY_HEALTH));
 
   useEffect(() => {
     loadData();
@@ -33,20 +62,11 @@ export default function ProfilePage() {
         api.get<Allergen[]>('/reference/allergens'),
       ]);
       setProfile(profileRes.data);
-      setHealth(healthRes.data);
+      const h = healthRes.data ?? EMPTY_HEALTH;
+      setHealth(h);
       setDiseases(diseasesRes.data);
       setAllergens(allergensRes.data);
-
-      const h = healthRes.data;
-      setForm({
-        weight: h.weight?.toString() || '',
-        height: h.height?.toString() || '',
-        age: h.age?.toString() || '',
-        gender: h.gender || 'MALE',
-        activityLevel: h.activityLevel || 'MODERATE',
-        diseaseIds: h.diseaseIds || [],
-        allergenIds: h.allergenIds || [],
-      });
+      setForm(healthToForm(h));
 
       try {
         const explRes = await api.get<NutritionExplanationDto>('/profile/health/explanation');
@@ -84,7 +104,9 @@ export default function ProfilePage() {
         diseaseIds: form.diseaseIds,
         allergenIds: form.allergenIds,
       });
-      setHealth(res.data);
+      const updated = res.data ?? EMPTY_HEALTH;
+      setHealth(updated);
+      setForm(healthToForm(updated));
       setEditHealth(false);
       toast.success('Профиль здоровья обновлён');
       try {
@@ -206,31 +228,50 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </div>
-            ) : !editHealth && health ? (
+            ) : !editHealth ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <InfoCard label="Вес" value={health.weight ? `${health.weight} кг` : '—'} />
-                  <InfoCard label="Рост" value={health.height ? `${health.height} см` : '—'} />
-                  <InfoCard label="Возраст" value={health.age?.toString() || '—'} />
+                  <InfoCard label="Вес" value={health.weight != null ? `${health.weight} кг` : '—'} />
+                  <InfoCard label="Рост" value={health.height != null ? `${health.height} см` : '—'} />
+                  <InfoCard label="Возраст" value={health.age != null ? health.age.toString() : '—'} />
                   <InfoCard label="Пол" value={health.gender === 'MALE' ? 'Мужской' : health.gender === 'FEMALE' ? 'Женский' : '—'} />
-                  <InfoCard label="Калории/день" value={health.dailyCalorieTarget?.toFixed(0) || '—'} accent />
-                  <InfoCard label="Белки/день" value={health.dailyProteinTarget?.toFixed(0) || '—'} />
-                  <InfoCard label="Жиры/день" value={health.dailyFatTarget?.toFixed(0) || '—'} />
-                  <InfoCard label="Углеводы/день" value={health.dailyCarbTarget?.toFixed(0) || '—'} />
+                  <InfoCard label="Калории/день" value={health.dailyCalorieTarget?.toFixed(0) ?? '—'} accent />
+                  <InfoCard label="Белки/день" value={health.dailyProteinTarget?.toFixed(0) ?? '—'} />
+                  <InfoCard label="Жиры/день" value={health.dailyFatTarget?.toFixed(0) ?? '—'} />
+                  <InfoCard label="Углеводы/день" value={health.dailyCarbTarget?.toFixed(0) ?? '—'} />
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {health.diseaseNames?.map((n) => (
-                    <Badge key={n} variant="warning">
-                      {n}
-                    </Badge>
-                  ))}
-                  {health.allergenNames?.map((n) => (
-                    <Badge key={n} variant="danger">
-                      {n}
-                    </Badge>
-                  ))}
+                <div className="space-y-1">
+                  <div className="text-sm text-gray-500 dark:text-slate-400">Заболевания</div>
+                  {health.diseaseNames && health.diseaseNames.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {Array.from(health.diseaseNames).map((n) => (
+                        <Badge key={n} variant="warning">{n}</Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm italic text-gray-400 dark:text-slate-500">Не указаны</div>
+                  )}
                 </div>
+
+                <div className="space-y-1">
+                  <div className="text-sm text-gray-500 dark:text-slate-400">Аллергены</div>
+                  {health.allergenNames && health.allergenNames.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {Array.from(health.allergenNames).map((n) => (
+                        <Badge key={n} variant="danger">{n}</Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm italic text-gray-400 dark:text-slate-500">Не указаны</div>
+                  )}
+                </div>
+
+                {health.weight == null && health.height == null && health.age == null && (
+                  <p className="text-sm italic text-gray-500 dark:text-slate-400">
+                    Профиль здоровья ещё не заполнен. Нажмите «Редактировать», чтобы добавить данные.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="space-y-4 animate-fade-in">
@@ -248,7 +289,7 @@ export default function ProfilePage() {
                     <select
                       value={form.gender}
                       onChange={(e) => setForm({ ...form, gender: e.target.value })}
-                      className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive"
+                      className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive"
                     >
                       <option value="MALE">Мужской</option>
                       <option value="FEMALE">Женский</option>
@@ -258,7 +299,7 @@ export default function ProfilePage() {
                     <select
                       value={form.activityLevel}
                       onChange={(e) => setForm({ ...form, activityLevel: e.target.value })}
-                      className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive"
+                      className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive"
                     >
                       <option value="SEDENTARY">Сидячий</option>
                       <option value="LIGHT">Лёгкая</option>
@@ -277,22 +318,29 @@ export default function ProfilePage() {
                       Добавить
                     </Button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {diseases.map((d) => (
-                      <button
-                        key={d.id}
-                        type="button"
-                        onClick={() => setForm({ ...form, diseaseIds: toggleId(form.diseaseIds, d.id) })}
-                        className={`rounded-full px-3 py-1 text-sm ring-1 transition-colors ${
-                          form.diseaseIds.includes(d.id)
-                            ? 'bg-amber/25 text-amber-dark ring-amber/30'
-                            : 'bg-gray-50 text-gray-700 ring-gray-200 hover:bg-gray-100'
-                        }`}
-                      >
-                        {d.name}
-                      </button>
-                    ))}
-                  </div>
+                  {diseases.length === 0 ? (
+                    <div className="text-sm italic text-gray-400 dark:text-slate-500">Список пуст. Добавьте первое заболевание выше.</div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {diseases.map((d) => {
+                        const active = form.diseaseIds.includes(d.id);
+                        return (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => setForm({ ...form, diseaseIds: toggleId(form.diseaseIds, d.id) })}
+                            className={`rounded-full px-3 py-1 text-sm ring-1 transition-colors ${
+                              active
+                                ? 'bg-amber/25 text-amber-dark ring-amber/30'
+                                : 'bg-gray-50 text-gray-700 ring-gray-200 hover:bg-gray-100 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {active ? '✓ ' : ''}{d.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -303,22 +351,29 @@ export default function ProfilePage() {
                       Добавить
                     </Button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {allergens.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        onClick={() => setForm({ ...form, allergenIds: toggleId(form.allergenIds, a.id) })}
-                        className={`rounded-full px-3 py-1 text-sm ring-1 transition-colors ${
-                          form.allergenIds.includes(a.id)
-                            ? 'bg-coral-light text-coral-dark ring-coral/25'
-                            : 'bg-gray-50 text-gray-700 ring-gray-200 hover:bg-gray-100'
-                        }`}
-                      >
-                        {a.name}
-                      </button>
-                    ))}
-                  </div>
+                  {allergens.length === 0 ? (
+                    <div className="text-sm italic text-gray-400 dark:text-slate-500">Список пуст. Добавьте первый аллерген выше.</div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {allergens.map((a) => {
+                        const active = form.allergenIds.includes(a.id);
+                        return (
+                          <button
+                            key={a.id}
+                            type="button"
+                            onClick={() => setForm({ ...form, allergenIds: toggleId(form.allergenIds, a.id) })}
+                            className={`rounded-full px-3 py-1 text-sm ring-1 transition-colors ${
+                              active
+                                ? 'bg-coral-light text-coral-dark ring-coral/25'
+                                : 'bg-gray-50 text-gray-700 ring-gray-200 hover:bg-gray-100 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {active ? '✓ ' : ''}{a.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <Button onClick={handleSaveHealth} className="w-full sm:w-auto">
@@ -376,9 +431,9 @@ export default function ProfilePage() {
 
 function InfoCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-xl p-3 ${accent ? 'bg-lime/20 ring-1 ring-olive/20' : 'bg-gray-50 ring-1 ring-gray-100'}`}>
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className={`text-lg font-semibold ${accent ? 'text-rose' : 'text-gray-900'}`}>{value}</p>
+    <div className={`rounded-xl p-3 ${accent ? 'bg-lime/20 ring-1 ring-olive/20 dark:bg-olive/10 dark:ring-olive/30' : 'bg-gray-50 ring-1 ring-gray-100 dark:bg-slate-800 dark:ring-slate-700'}`}>
+      <p className="text-xs text-gray-500 dark:text-slate-400">{label}</p>
+      <p className={`text-lg font-semibold ${accent ? 'text-rose dark:text-rose-light' : 'text-gray-900 dark:text-slate-100'}`}>{value}</p>
     </div>
   );
 }
@@ -386,7 +441,7 @@ function InfoCard({ label, value, accent }: { label: string; value: string; acce
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <div className="text-sm font-medium text-gray-700">{label}</div>
+      <div className="text-sm font-medium text-gray-700 dark:text-slate-200">{label}</div>
       {children}
     </div>
   );
@@ -395,8 +450,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <div className="text-gray-600">{label}</div>
-      <div className="font-medium text-gray-900">{value}</div>
+      <div className="text-gray-600 dark:text-slate-400">{label}</div>
+      <div className="font-medium text-gray-900 dark:text-slate-100">{value}</div>
     </div>
   );
 }
