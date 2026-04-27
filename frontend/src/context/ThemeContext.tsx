@@ -9,14 +9,16 @@ type ThemeCtx = {
 
 const ThemeContext = createContext<ThemeCtx | null>(null);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'light';
+  const stored = window.localStorage.getItem('theme');
+  if (stored === 'light' || stored === 'dark') return stored;
+  if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
+  return 'light';
+}
 
-  useEffect(() => {
-    const stored = (localStorage.getItem('theme') as Theme | null) ?? null;
-    const initial: Theme = stored ?? 'light';
-    setTheme(initial);
-  }, []);
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
