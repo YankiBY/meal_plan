@@ -28,6 +28,7 @@ public class HealthProfileService {
     private final DiseaseRepository diseaseRepository;
     private final AllergenRepository allergenRepository;
 
+    @Transactional(readOnly = true)
     public HealthProfileDto getProfile(String username) {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));

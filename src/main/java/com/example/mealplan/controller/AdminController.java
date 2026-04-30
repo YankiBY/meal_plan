@@ -2,12 +2,14 @@ package com.example.mealplan.controller;
 
 import com.example.mealplan.dto.ActivityStatsDto;
 import com.example.mealplan.dto.RecipeDto;
+import com.example.mealplan.dto.UpdateUserRequest;
 import com.example.mealplan.dto.UserDto;
 import com.example.mealplan.entity.Allergen;
 import com.example.mealplan.entity.Category;
 import com.example.mealplan.entity.Disease;
 import com.example.mealplan.entity.Ingredient;
 import com.example.mealplan.service.AdminService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +31,11 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsers());
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(adminService.updateUser(id, request));
     }
 
     @PostMapping("/users/{id}/role")

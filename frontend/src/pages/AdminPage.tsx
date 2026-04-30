@@ -25,6 +25,8 @@ export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('stats');
   const [stats, setStats] = useState<ActivityStatsDto | null>(null);
   const [users, setUsers] = useState<UserDto[]>([]);
+  const [editingUser, setEditingUser] = useState<UserDto | null>(null);
+  const [editForm, setEditForm] = useState<{ username: string; email: string; blocked: boolean; role: string }>({ username: '', email: '', blocked: false, role: 'ROLE_USER' });
   const [pendingRecipes, setPendingRecipes] = useState<RecipeDto[]>([]);
   const [diseases, setDiseases] = useState<Disease[]>([]);
   const [allergens, setAllergens] = useState<Allergen[]>([]);
@@ -63,7 +65,6 @@ export default function AdminPage() {
 
   const blockUser = async (id: number) => { await api.post(`/admin/users/${id}/block`); toast.success('Заблокирован'); loadTab(); };
   const unblockUser = async (id: number) => { await api.post(`/admin/users/${id}/unblock`); toast.success('Разблокирован'); loadTab(); };
-  const changeRole = async (id: number, role: string) => { await api.post(`/admin/users/${id}/role?role=${role}`); toast.success('Роль изменена'); loadTab(); };
   const resetPassword = async (id: number) => {
     const pw = prompt('Новый пароль:');
     if (!pw) return;
@@ -75,6 +76,33 @@ export default function AdminPage() {
     await api.delete(`/admin/users/${id}`);
     toast.success('Пользователь удалён');
     loadTab();
+  };
+
+  const startEditUser = (u: UserDto) => {
+    setEditingUser(u);
+    setEditForm({
+      username: u.username,
+      email: u.email,
+      blocked: u.blocked,
+      role: u.roles.includes('ROLE_ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER',
+    });
+  };
+
+  const cancelEditUser = () => {
+    setEditingUser(null);
+  };
+
+  const saveEditUser = async () => {
+    if (!editingUser) return;
+    try {
+      await api.put(`/admin/users/${editingUser.id}`, editForm);
+      toast.success('Пользователь обновлён');
+      setEditingUser(null);
+      loadTab();
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Ошибка обновления');
+    }
   };
 
   const moderateRecipe = async (id: number, approve: boolean) => {
@@ -244,8 +272,8 @@ export default function AdminPage() {
                   <td className="p-3 text-center">{u.blocked ? <span className="text-coral font-medium">Заблокирован</span> : <span className="text-olive">Активен</span>}</td>
                   <td className="p-3 text-center">
                     <div className="flex gap-1 justify-center flex-wrap">
+                      <Btn onClick={() => startEditUser(u)} label="Редактировать" />
                       {u.blocked ? <Btn onClick={() => unblockUser(u.id)} label="Разблокировать" /> : <Btn onClick={() => blockUser(u.id)} label="Заблокировать" color="red" />}
-                      <Btn onClick={() => changeRole(u.id, u.roles.includes('ROLE_ADMIN') ? 'ROLE_USER' : 'ROLE_ADMIN')} label={u.roles.includes('ROLE_ADMIN') ? 'Сделать пользователем' : 'Сделать админом'} />
                       <Btn onClick={() => resetPassword(u.id)} label="Сброс пароля" />
                       <Btn onClick={() => deleteUser(u.id)} label="Удалить" color="red" />
                     </div>
@@ -254,6 +282,69 @@ export default function AdminPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={cancelEditUser}>
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-lg ring-1 ring-gray-200 dark:ring-slate-800 p-6 animate-fade-in" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100">Редактирование пользователя #{editingUser.id}</h2>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">Имя пользователя</label>
+                <input
+                  className="block w-full px-3 py-2 border dark:border-slate-700 rounded text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-olive focus:border-transparent outline-none"
+                  value={editForm.username}
+                  onChange={e => setEditForm({ ...editForm, username: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">Email</label>
+                <input
+                  type="email"
+                  className="block w-full px-3 py-2 border dark:border-slate-700 rounded text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-olive focus:border-transparent outline-none"
+                  value={editForm.email}
+                  onChange={e => setEditForm({ ...editForm, email: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">Роль</label>
+                <select
+                  className="block w-full px-3 py-2 border dark:border-slate-700 rounded text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-olive focus:border-transparent outline-none"
+                  value={editForm.role}
+                  onChange={e => setEditForm({ ...editForm, role: e.target.value })}
+                >
+                  <option value="ROLE_USER">Пользователь</option>
+                  <option value="ROLE_ADMIN">Администратор</option>
+                </select>
+              </div>
+              <div>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 accent-coral"
+                    checked={editForm.blocked}
+                    onChange={e => setEditForm({ ...editForm, blocked: e.target.checked })}
+                  />
+                  Заблокирован
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end mt-6">
+              <button
+                onClick={cancelEditUser}
+                className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-4 py-2 rounded text-sm hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={saveEditUser}
+                className="bg-olive text-white px-4 py-2 rounded text-sm hover:bg-olive-dark transition-colors"
+              >
+                Сохранить
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

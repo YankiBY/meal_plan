@@ -17,7 +17,7 @@ export default function Badge({
           ? 'bg-coral-light text-coral-dark ring-1 ring-coral/25'
           : variant === 'info'
             ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
-            : 'bg-gray-50 text-gray-700 ring-1 ring-gray-200';
+            : 'bg-gray-50 text-gray-700 ring-1 ring-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700';
 
   return (
     <span

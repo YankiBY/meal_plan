@@ -2,6 +2,7 @@ package com.example.mealplan.service;
 
 import com.example.mealplan.dto.ActivityStatsDto;
 import com.example.mealplan.dto.RecipeDto;
+import com.example.mealplan.dto.UpdateUserRequest;
 import com.example.mealplan.dto.UserDto;
 import com.example.mealplan.entity.*;
 import com.example.mealplan.exception.BadRequestException;
@@ -75,6 +76,45 @@ public class AdminService {
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Transactional
+    public UserDto updateUser(Long userId, UpdateUserRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
+
+        String newUsername = request.getUsername();
+        if (!user.getUsername().equals(newUsername)) {
+            userRepository.findByUsername(newUsername).ifPresent(existing -> {
+                if (!existing.getId().equals(userId)) {
+                    throw new BadRequestException("Имя пользователя уже занято");
+                }
+            });
+            user.setUsername(newUsername);
+        }
+
+        String newEmail = request.getEmail();
+        if (!user.getEmail().equals(newEmail)) {
+            userRepository.findByEmail(newEmail).ifPresent(existing -> {
+                if (!existing.getId().equals(userId)) {
+                    throw new BadRequestException("Email уже используется");
+                }
+            });
+            user.setEmail(newEmail);
+        }
+
+        if (request.getBlocked() != null) {
+            user.setBlocked(request.getBlocked());
+        }
+
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            Role role = roleRepository.findByName(request.getRole())
+                    .orElseThrow(() -> new ResourceNotFoundException("Роль не найдена: " + request.getRole()));
+            user.getRoles().clear();
+            user.getRoles().add(role);
+        }
+
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Transactional

@@ -52,3 +52,32 @@
   transform: translateY(-2px);
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
 }
+
+/* Native form-control adaptation in dark mode (date pickers, scrollbars) */
+html.dark { color-scheme: dark; }
+
+/* Dark-mode fallbacks for elements/utilities without explicit `dark:` variants
+   (covers older pages that still use plain `bg-white`, `text-gray-900`, etc.).
+   `:where(.dark ...)` keeps specificity at 0 so explicit utilities still win. */
+:where(.dark) .bg-white:not(.dark\:bg-slate-900):not(.dark\:bg-slate-800):not(.dark\:bg-slate-950) {
+  background-color: rgb(15 23 42);
+  color: rgb(241 245 249);
+}
+:where(.dark) .bg-gray-50:not([class*="dark:bg-"]) {
+  background-color: rgb(30 41 59);
+  color: rgb(226 232 240);
+}
+:where(.dark) .bg-gray-100:not([class*="dark:bg-"]) {
+  background-color: rgb(51 65 85);
+  color: rgb(226 232 240);
+}
+:where(.dark) .text-gray-900:not([class*="dark:text-"]) { color: rgb(241 245 249); }
+:where(.dark) .text-gray-800:not([class*="dark:text-"]) { color: rgb(226 232 240); }
+:where(.dark) .text-gray-700:not([class*="dark:text-"]) { color: rgb(203 213 225); }
+:where(.dark) .text-gray-600:not([class*="dark:text-"]) { color: rgb(203 213 225); }
+:where(.dark) .text-gray-500:not([class*="dark:text-"]) { color: rgb(148 163 184); }
+:where(.dark) .text-gray-400:not([class*="dark:text-"]) { color: rgb(148 163 184); }
+:where(.dark) .border-gray-100:not([class*="dark:border-"]),
+:where(.dark) .border-gray-200:not([class*="dark:border-"]) { border-color: rgb(51 65 85); }
+:where(.dark) .ring-gray-100:not([class*="dark:ring-"]),
+:where(.dark) .ring-gray-200:not([class*="dark:ring-"]) { --tw-ring-color: rgb(51 65 85); }
