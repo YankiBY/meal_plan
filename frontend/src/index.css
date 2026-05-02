@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-olive: #b3cc57;
+  --color-olive-dark: #96ad3e;
+  --color-lime: #ecf081;
+  --color-lime-dark: #dce26a;
+  --color-amber: #ffbe40;
+  --color-amber-dark: #e5a530;
+  --color-coral: #ef746f;
+  --color-coral-dark: #d9524d;
+  --color-coral-light: #fbe8e7;
+  --color-rose: #ab3e5b;
+  --color-rose-dark: #8e3049;
+  --color-rose-light: #f0d0d9;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 240ms ease-out both;
+}
+
+.hover-lift {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.shopping-item-text {
+  position: relative;
+  display: inline-block;
+  color: rgb(17 24 39);
+  transition: color 250ms ease;
+}
+
+.shopping-item-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgb(156 163 175);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 260ms ease;
+}
+
+.shopping-item-text.is-checked {
+  color: rgb(107 114 128);
+}
+
+.shopping-item-text.is-checked::after {
+  transform: scaleX(1);
+}
+
+:where(.dark) .shopping-item-text:not(.is-checked) {
+  color: rgb(241 245 249);
+}
+
+:where(.dark) .shopping-item-text.is-checked {
+  color: rgb(148 163 184);
+}
+
+/* Native form-control adaptation in dark mode (date pickers, scrollbars) */
+html.dark { color-scheme: dark; }
+
+/* Dark-mode fallbacks for elements/utilities without explicit `dark:` variants
+   (covers older pages that still use plain `bg-white`, `text-gray-900`, etc.).
+   `:where(.dark ...)` keeps specificity at 0 so explicit utilities still win. */
+:where(.dark) .bg-white:not(.dark\:bg-slate-900):not(.dark\:bg-slate-800):not(.dark\:bg-slate-950) {
+  background-color: rgb(15 23 42);
+  color: rgb(241 245 249);
+}
+:where(.dark) .bg-gray-50:not([class*="dark:bg-"]) {
+  background-color: rgb(30 41 59);
+  color: rgb(226 232 240);
+}
+:where(.dark) .bg-gray-100:not([class*="dark:bg-"]) {
+  background-color: rgb(51 65 85);
+  color: rgb(226 232 240);
+}
+:where(.dark) .text-gray-900:not([class*="dark:text-"]) { color: rgb(241 245 249); }
+:where(.dark) .text-gray-800:not([class*="dark:text-"]) { color: rgb(226 232 240); }
+:where(.dark) .text-gray-700:not([class*="dark:text-"]) { color: rgb(203 213 225); }
+:where(.dark) .text-gray-600:not([class*="dark:text-"]) { color: rgb(203 213 225); }
+:where(.dark) .text-gray-500:not([class*="dark:text-"]) { color: rgb(148 163 184); }
+:where(.dark) .text-gray-400:not([class*="dark:text-"]) { color: rgb(148 163 184); }
+:where(.dark) .border-gray-100:not([class*="dark:border-"]),
+:where(.dark) .border-gray-200:not([class*="dark:border-"]) { border-color: rgb(51 65 85); }
+:where(.dark) .ring-gray-100:not([class*="dark:ring-"]),
+:where(.dark) .ring-gray-200:not([class*="dark:ring-"]) { --tw-ring-color: rgb(51 65 85); }
